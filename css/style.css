@@ -24,18 +24,23 @@ h2{
 }
 
 h3{
-    color:#f4fe00;
+    color:#6600FF;
     font-weight: bold;
     font-size:32px;
 }
 h4{
-    color:#FF8C00;
+    color:#800000 ;
     font-weight: bold;
     font-size:24px;
 }
 
+em{
+    color:#6600FF;
+    font-weight: bold;
+    font-size:24px;
+}
 body{
-    background-color: black;
+    background-color:#E8E8E8 ;
 }
 tbody, thead{
     color:white;
@@ -50,7 +55,7 @@ h6{
     font-family: Arial;
     font-size: 22px;
     text-align: justify;
-    color: #FFFFCC;
+    color: #282828 ;
     line-height: 1.2;
 }
 a .page-scroll{
@@ -102,23 +107,23 @@ nobr{
 }
 
 .top-nav-collapse{
-    background-color:orange;
+    background-color:#6600FF;
 }
 .top-nav-collapse .navbar-right{
-    background-color:orange ;
+    background-color:#6600FF ;
 }
 .top-nav-collapse .navbar-right ul li a{
     color: #ffffff;
 }
 
 .top-nav-collapse .navbar-right ul li a:hover{
-    background-color: darkorange;
+    background-color: #6600FF;
 }
 .top-nav-collapse .navbar-right ul li a:active{
-    background-color: darkorange;
+    background-color: #6600FF;
 }
 .top-nav-collapse .navbar-right ul li a:visited{
-    background-color: darkorange;
+    background-color: #6600FF;
 }
 .top-nav-collapse .navbar-brand h1{
     color:#ffffff ;
@@ -145,11 +150,11 @@ div .web-title h1{
 }
 
 .span-color1{
-    color:darkorange;
+    color:white;
 }
 
 .span-color2{
-    color:#f4fe00;
+    color:black;
 }
 #webpage-title{
     font-size:100px;
@@ -167,7 +172,7 @@ h2#teammates{
 .intro {
     width:100%;
     position:relative;
-    background: url(../img/back6.jpg) no-repeat top center;
+    background: url(../img/back1.jpg) no-repeat top center;
 }
 
 #intro.intro {
