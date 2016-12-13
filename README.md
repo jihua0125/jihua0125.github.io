@@ -1,5 +1,5 @@
-# Yinnanzh.github.io
+# jihua0125.github.io
 
 Data Science 2016 final project web page
-Topic: Hearth Science
-Group member: Chi-Hsuan Chang, Yinnan Zheng, Ji Hua, Xue Zou
+Topic: Hot Hand Theory
+Group member: Benny Ren, Ji Hua, Rishi Singh
