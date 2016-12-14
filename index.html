@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HearthScience</title>
+    <title>The hot hand-CS 209a Project</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="css/scrolling-nav.css" rel="stylesheet">
@@ -115,6 +115,9 @@
             <h6>Though the original data set contains a lot of information about the shots, however, the information about the players themselves are not included. To get extra information such as height, weight, age and so on, we
                 scrapped data from the following website: <a href="http://www.basketball-reference.com/players/">http://www.basketball-reference.com/players/</a>.
             </h6>
+            <div class="row" align="center">
+                <img src = "img/bio.png" width="600">
+            </div>
         </div>
         <div class = "container">
             <h3 align="left">Exploratory Analysis</h3>
@@ -145,7 +148,7 @@
         </div>
         </div>
         <div class = "container">
-            <h3 align="left">Data Wrangling</h3>
+            <h3 align="left">Data Wrangling and Feature Selection</h3>
             <h6> The original data set has many details about each shot in each game. Some of them are useful while some of them are not.
                 Besides, some of the features need to be transformed into categorical or ordinal variables.
                 The following image shows how we deal with the features.
@@ -156,9 +159,15 @@
                     <img src = "img/variables.png" width="450">
                 </div>
             </div>
+            <h6>Based on the forward selection method, we have rank the variable by it's importance to our model. The results are showed in below:</h6>
+            <br>
+            <div class="row" align="center">
+                <img src = "img/variable_importance.png" width="750">
+            </div>
+
         </div>
             <div class = "container">
-                <h3 align="left">Streak Matrix</h3>
+                <h3 align="left">Streak Metric</h3>
                 <h6> The data is recorded sequentially but independently.
                     So, we need to transform the shot results into a sequence instead of original format.
                     For example, if player A made 6 shots in game 1, the first 2 are missed, and the following 3 made goals and the last shot missed the target again, we will transform this into a string of 001110.
@@ -169,9 +178,10 @@
                     </li>
                     <li><b>Shot confidence streak:</b>
                         Based on the data, we found that it has a very low probability of missing consecutive 4 or more shots (Pr=0.0448<0.05).
-                        So we used shot confidence to measure if the player missed all previous 4 shots or not.
-                        This is will set to 1 if the player made at least 1 shots of the 4 shots. Otherwise, it will be 0.
-                        Instead of measuring how hot is the player, we consider this as measurement of "cold hand".
+                        So we used whether the player missed all previous 4 shots or not as a streak metric.
+                        This is will be set to 1 if the player made at least 1 shots of the 4 shots. Otherwise, it will be 0.
+                        Instead of measuring how hot is the player, we consider this as measurement of "cold hand". We call this the "shot confidence" metric because
+                        a player who has made at least 1 of the past 4 shots will be confident that they will be able to make another.
                     </li>
                     <div class = "container-fluid">
                         <br>
@@ -194,24 +204,36 @@
                 <h2 id="title-2" align="left">Modeling</h2>
                 <br>
             </div>
-            <h3>Model Fitting</h3>
+            <h3>Basic Streak Analysis</h3>
             <h6>
-
+                Given the results of forward selection, we obtain a baseline set of predictors, which do not include any streak metrics or biometric predictors.
+                Moving forward, we perform logistic regressions with these baseline predictors, attempting to classify shots as “made” or “missed”.
+                One by one, we add different streak metrics and biometric data to the list of predictors, and see how the results of our model change.
+                The basic streak analysis is simply to see whether the probability of making a shot increases given that the previous shot was successful.
+                This is flawed, since shot difficulty often sequentially increases as a player’s “streak” continues.
+                Therefore, we use multiple predictors, and see whether the coefficient of our streak metric, within the logistic regression model, is significantly different from zero.
+                We hypothesize that biometric data (differences in age, weight, and height) will account for other unseen difficulties in making a shot, and will in turn yield coefficients for our streak metric showing higher importance.
+                Below we summarize, for different combinations of streak metrics and biometric data, how the variable importances change within each model.
             </h6>
-            <div class = "container-fluid">
-                <br>
-                <div class="row" align="center">
-                    <img src = "img/2.png" width="600">
-                </div>
-                <div class="row" align="center">
-                    <img src = "img/3.png" width="600">
-                </div>
-                <div class="row" align="center">
-                    <img src = "img/4.png" width="600">
-                </div>
+            <br>
+            <div class="row" align="center">
+                <img src = "img/4.png" width="800">
+            </div>
+            <br>
+            <h6>
+                The above analysis shows that while biometric data does not have a large effect in any of our models, its presence does in some instances yield a significant effect of streak metrics.
+                We have summarized below the changes in overall model accuracy when predicting made and missed shots for the various combinations of predictors used in each model.
+                Additionally, we hypothesized that high volume shooters (those given the opportunity to shoot more) may be streakier than the general pool of shooters in the data.
+                We divided our data into two groups: high and low volume shooters. Using these two groups, we fit the same combinations of predictors and looked at overall model accuracy.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/2.png" width="800">
+            </div>
+            <div class="row" align="center">
+                <img src = "img/3.png" width="800">
             </div>
 
-            <h3 align="left">Test Results</h3>
+            <h3 align="left">Streak & Biometrics Results</h3>
             <style type="text/css">
                 .tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
                 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
@@ -246,6 +268,63 @@
                     <td class="tg-baqh">0.6098</td>
                 </tr>
             </table>
+
+            <h3 align="left">Streak Analysis by Grouping on Shot Distance</h3>
+            <h6>
+                Through variable selection we identified “Shot Distance” as the single most important variable affecting the success of a given shot (see Data Wrangling and Feature Selection part).
+                Of course, the further away a shot is from the hoop the more precision and skill it requires.
+                Among our data, we see a clear bias in how shots of different distances are selected.
+                Players tend to take a lot of shots close to the hoop due to ease, or shots at the 3-point line for higher return on the more difficult shot.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist1.png" width="800">
+            </div>
+            <br>
+            <h6>
+                Those who watch the game of basketball know that taller players (usually centers and forwards) do not generally take shots far away from the hoop.
+                Our data confirms this: distributions of shot distances for short, medium height, and tall players show that taller players tend to take more shots close to the hoop.
+                The shortest players are the most likely to take shots at the 3-point line and beyond.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist2.png" width="800">
+            </div>
+            <br>
+            <h6>
+                Intuitively one would assume that the closeness of a defender is directly related to the difficulty of a shot.
+                We predicted that the effect of closest defender distance would vary with the shot distance.
+                In particular, a defender that is one foot away from a shooter at the 3-point line would be considered above average,
+                or “tight defense,” whereas a defender one foot away from a player right at the hoop would by typical.
+                Our data shows that the average defender distance from the shooter varies as the shooter gets further from the hoop.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist3.png" width="800">
+            </div>
+            <br>
+            <h6>
+                This effect is also seen to be important in whether the shooter is tending to make or miss the shot.
+                The following graph shows that mean defender distance is not correlated with makes vs misses when considering all shot distances.
+                However, when grouping the shots by increasingly higher shot distance thresholds, we see that the correlation between defender distance and the probability of missing a shot increases in magnitude.
+                <br>
+                <b>NOTE: </b>The negative correlation seen when considering all observations is due to noise.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist4.png" width="800">
+            </div>
+            <br>
+            <h6>
+                Given the relationships between shot distance, shot accuracy, and player metrics, we decided to explore how the importance of different variables changes when grouping shots by shot distance.
+                Additionally, we included streak metrics in our analysis, since shots further away from the hoop require more skill.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist5.png" width="800">
+            </div>
+            <br>
+            <h6>
+                Using the same predictors used in the general analysis of the streak metric and biometric data, we performed logistic regressions on normalized predictors for observations grouped by shot distance.
+            </h6>
+            <div class="row" align="center">
+                <img src = "img/shot_dist6.png" width="800">
+            </div>
         </div>
     </div>
 </section>
@@ -258,9 +337,18 @@
                 <br>
             </div>
             <h6>
+                In conclusion, we see that the shot confidence metric has a coefficient that is consistently different from 0.
+                We decided to incorporate this metric into our final models.
+                In addition, we also choose to use a low volume shooter data set to build a model without streak and a high volume data set with the shot confidence metric.
+                We see that the prediction accuracy in our models do not improve significantly with different predictors.
+                When we incorporate our best hot hand metric, we see that it does not improve prediction accuracy of shots.
+                Under these models and definitions of hot handedness, hot hand theory is false.
+            </h6>
+            <h3 align="left">For Basic Streak Analysis</h3>
+            <h6>
                 <b>Streak metrics do not have large effect on model prediction</b>
                 The current models do not show significant differences in accuracy when the streak metrics are included in the predictor set.
-                This may be due to the fact that streaks tend to be rare, therefore only making up a small percentage of the total dataset.
+                This may be due to the fact that streaks tend to be rare, therefore only making up a small percentage of the total data set.
                 However, among the basic predictor set, the shot confidence metric was most influential.
                 <br>
                 <b>Biometric data does not significantly affect model prediction</b>
@@ -271,6 +359,42 @@
                 Attempted shots is a good standard by which to measure how good a player is.
                 Better offensive players are given more opportunities to shoot. Models built on better players’ data
                 (those taking over 9 shots per game) showed significant increases in accuracy with the addition of streak metrics.
+
+            </h6>
+            <h3 align="left">For Streak Analysis by Grouping on Shot Distance</h3>
+            <h6>
+                <b>Closest defender distance decreases in importance as shots get further away</b>
+                This is interesting, since it is not an obvious relationship.
+                While one would expect the defender distance to be predictive of whether or not someone makes a shot, the fact that it is more important close to the hoop is not as obvious.
+                This may, however, be an artifact of our dataset.
+                The dataset only shows the closest defender's distance, not necessarily the person who is actively contesting the shooter's shot.
+                Perhaps there is better correlation between the closest-defender-distance
+                and the shot probability close to the hoop because the closest defender listed is likely to be the actual defender when the shooter is near the hoop.
+
+
+                <br>
+                <b>Longer touch time affects accuracy adversely when close to the hoop but positively when further away</b>
+                From the above analysis, we see that touch time (the time the ball is held by the shooter before shooting) is negatively correlated when the shot is close to the hoop,
+                but becomes positively correlated for shots in the 3-point range.
+
+                <br>
+                <b>Height difference mainly affects shots between 5 and 10 feet from the hoop</b>
+                Height difference doesn't seem to have much of an effect on the shot probability.
+                However, it seems that it may have a significant effect for shots in the range of 5-10 feet.
+                Perhaps mismatch defense is most effective for stopping midrange shots.
+
+                <br>
+                <b>Weight difference helps midrange shooters but hurts shots both close and very far from the hoop</b>
+                In both analyses looking at the shot-range dependence, weight the importance of weight difference peaks for jump shots in the 15-20ft range.
+                When the defender weighs more than the shooter, it seems the shooter has an advantage in mid-range jumpers.
+                It is interesting to conjecture why, but intuition says that, given the general quickness of mid-range jumpers, the heavier defenders probably have a hard time dealing with quickness of the shot.
+                Further, the weight difference works against shooters when the shot is close to the hoop.
+                This makes sense, as larger defenders who are better at defending near the hoop tend to be heavier.
+
+                <br>
+                <b>Streak metrics did not play a significant role in shot success despite grouping by shot distance</b>
+                Once again, it seems that the streak metric does not show a significant correlation with made/missed shots.
+
 
             </h6>
             <h3 align="left">Future Work</h3>
@@ -297,7 +421,7 @@
     </div>
 
 </section>
-<section id="Code">
+<section id="code">
     <div class="section-head">
         <div class = "container">
                 <h2 align="left">Code</h2>
